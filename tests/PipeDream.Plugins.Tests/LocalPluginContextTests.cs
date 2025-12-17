@@ -1,5 +1,7 @@
 using System;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.PluginTelemetry;
+using Moq;
 using PipeDream.Plugins.Tests.Fakes;
 using Xunit;
 
@@ -33,6 +35,64 @@ namespace PipeDream.Plugins.Tests
         }
 
         [Fact]
+        public void Constructor_InitializesNotificationService()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.NotNull(context.NotificationService);
+        }
+
+        [Fact]
+        public void Constructor_InitializesLogger()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.NotNull(context.Logger);
+        }
+
+        [Fact]
+        public void Constructor_WithCustomLogger_UsesCustomLogger()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var customLogger = new Mock<ILogger>().Object;
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider, customLogger);
+
+            // Assert
+            Assert.Same(customLogger, context.Logger);
+        }
+
+        [Fact]
+        public void Constructor_InitializesPluginExecutionContext2Through7()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.NotNull(context.PluginExecutionContext2);
+            Assert.NotNull(context.PluginExecutionContext3);
+            Assert.NotNull(context.PluginExecutionContext4);
+            Assert.NotNull(context.PluginExecutionContext5);
+            Assert.NotNull(context.PluginExecutionContext6);
+            Assert.NotNull(context.PluginExecutionContext7);
+        }
+
+        [Fact]
         public void Target_ReturnsEntityFromInputParameters()
         {
             // Arrange
@@ -54,6 +114,21 @@ namespace PipeDream.Plugins.Tests
         {
             // Arrange
             var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.Null(context.Target);
+        }
+
+        [Fact]
+        public void Target_ReturnsNullWhenTargetIsEntityReference()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var targetRef = new EntityReference("account", Guid.NewGuid());
+            serviceProvider.SetTargetReference(targetRef);
 
             // Act
             var context = new LocalPluginContext(serviceProvider);
@@ -86,6 +161,19 @@ namespace PipeDream.Plugins.Tests
             var serviceProvider = new FakeServiceProvider();
             var targetEntity = new Entity("account") { Id = Guid.NewGuid() };
             serviceProvider.SetTarget(targetEntity);
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.Null(context.TargetReference);
+        }
+
+        [Fact]
+        public void TargetReference_ReturnsNullWhenNotPresent()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
 
             // Act
             var context = new LocalPluginContext(serviceProvider);
@@ -139,6 +227,19 @@ namespace PipeDream.Plugins.Tests
             // Assert
             Assert.NotNull(context.PostImage);
             Assert.Equal("Updated Account", context.PostImage.GetAttributeValue<string>("name"));
+        }
+
+        [Fact]
+        public void PostImage_ReturnsNullWhenNoImages()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.Null(context.PostImage);
         }
 
         [Fact]
@@ -213,6 +314,22 @@ namespace PipeDream.Plugins.Tests
         }
 
         [Fact]
+        public void Trace_WithWhitespaceMessage_DoesNotTrace()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Act
+            context.Trace("   ");
+
+            // Assert - Trace should not be called for whitespace-only message
+            serviceProvider.TracingServiceMock.Verify(
+                x => x.Trace(It.IsAny<string>(), It.IsAny<object[]>()),
+                Times.Never);
+        }
+
+        [Fact]
         public void LogInfo_WritesToTracingServiceAndLogger()
         {
             // Arrange
@@ -229,6 +346,23 @@ namespace PipeDream.Plugins.Tests
             serviceProvider.LoggerMock.Verify(
                 x => x.LogInformation(It.Is<string>(s => s.Contains("Info message"))),
                 Times.Once);
+        }
+
+        [Fact]
+        public void LogInfo_WithEmptyMessage_DoesNotLog()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Act
+            context.LogInfo("");
+            context.LogInfo(null);
+
+            // Assert
+            serviceProvider.LoggerMock.Verify(
+                x => x.LogInformation(It.IsAny<string>()),
+                Times.Never);
         }
 
         [Fact]
@@ -251,6 +385,23 @@ namespace PipeDream.Plugins.Tests
         }
 
         [Fact]
+        public void LogWarning_WithEmptyMessage_DoesNotLog()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Act
+            context.LogWarning("");
+            context.LogWarning(null);
+
+            // Assert
+            serviceProvider.LoggerMock.Verify(
+                x => x.LogWarning(It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Fact]
         public void LogError_WritesToTracingServiceAndLogger()
         {
             // Arrange
@@ -267,6 +418,23 @@ namespace PipeDream.Plugins.Tests
             serviceProvider.LoggerMock.Verify(
                 x => x.LogError(It.Is<string>(s => s.Contains("Error message"))),
                 Times.Once);
+        }
+
+        [Fact]
+        public void LogError_WithEmptyMessage_DoesNotLog()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Act
+            context.LogError("");
+            context.LogError(null);
+
+            // Assert
+            serviceProvider.LoggerMock.Verify(
+                x => x.LogError(It.IsAny<string>()),
+                Times.Never);
         }
 
         [Fact]
@@ -287,6 +455,49 @@ namespace PipeDream.Plugins.Tests
             serviceProvider.LoggerMock.Verify(
                 x => x.LogError(exception, It.Is<string>(s => s.Contains("Error with exception"))),
                 Times.Once);
+        }
+
+        [Fact]
+        public void LogError_WithNullExceptionAndNullMessage_DoesNotLog()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Act
+            context.LogError(null, null);
+
+            // Assert
+            serviceProvider.LoggerMock.Verify(
+                x => x.LogError(It.IsAny<Exception>(), It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public void ServiceProvider_ReturnsSameInstancePassedToConstructor()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.Same(serviceProvider, context.ServiceProvider);
+        }
+
+        [Fact]
+        public void OrgSvcFactory_ReturnsOrganizationServiceFactory()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+
+            // Act
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Assert
+            Assert.NotNull(context.OrgSvcFactory);
+            Assert.Same(serviceProvider.OrganizationServiceFactoryMock.Object, context.OrgSvcFactory);
         }
     }
 }

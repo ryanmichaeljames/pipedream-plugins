@@ -288,5 +288,3 @@ protected override void ExecuteDataversePlugin(ILocalPluginContext localPluginCo
 ```
 
 Each trace shows milliseconds elapsed since the previous trace, making it easy to identify performance bottlenecks.
-
-

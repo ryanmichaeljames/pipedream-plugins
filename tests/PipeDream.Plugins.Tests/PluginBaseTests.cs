@@ -1,4 +1,5 @@
 using System;
+using System.ServiceModel;
 using Microsoft.Xrm.Sdk;
 using Moq;
 using PipeDream.Plugins.Interfaces;
@@ -100,6 +101,55 @@ namespace PipeDream.Plugins.Tests
             Assert.Contains("TestPlugin", plugin.GetPluginClassName());
         }
 
+        [Fact]
+        public void Execute_WhenOrganizationServiceFaultThrown_WrapsInInvalidPluginExecutionException()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var plugin = new TestPluginThatThrowsOrgServiceFault();
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidPluginExecutionException>(() => plugin.Execute(serviceProvider));
+            Assert.Contains("OrganizationServiceFault", exception.Message);
+        }
+
+        [Fact]
+        public void Execute_WhenExceptionThrown_StillTracesExit()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var plugin = new TestPluginThatThrowsOrgServiceFault();
+
+            // Act
+            try
+            {
+                plugin.Execute(serviceProvider);
+            }
+            catch
+            {
+                // Expected exception
+            }
+
+            // Assert - should still trace exit
+            serviceProvider.TracingServiceMock.Verify(
+                x => x.Trace(It.Is<string>(s => s.Contains("Exiting")), It.IsAny<object[]>()),
+                Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public void Execute_WithCustomLocalPluginContext_UsesCustomContext()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var plugin = new TestPluginWithCustomContext();
+
+            // Act
+            plugin.Execute(serviceProvider);
+
+            // Assert
+            Assert.True(plugin.UsedCustomContext);
+        }
+
         /// <summary>
         /// Test plugin implementation for testing PluginBase.
         /// </summary>
@@ -131,6 +181,58 @@ namespace PipeDream.Plugins.Tests
 
             public string GetUnsecureConfig() => UnsecureConfig;
             public string GetSecureConfig() => SecureConfig;
+        }
+
+        /// <summary>
+        /// Test plugin that throws OrganizationServiceFault.
+        /// </summary>
+        private class TestPluginThatThrowsOrgServiceFault : PluginBase
+        {
+            public TestPluginThatThrowsOrgServiceFault() : base(typeof(TestPluginThatThrowsOrgServiceFault))
+            {
+            }
+
+            protected override void ExecuteDataversePlugin(ILocalPluginContext localPluginContext)
+            {
+                var fault = new OrganizationServiceFault { Message = "Test fault" };
+                throw new FaultException<OrganizationServiceFault>(fault, "Test fault message");
+            }
+        }
+
+        /// <summary>
+        /// Test plugin with custom local plugin context.
+        /// </summary>
+        private class TestPluginWithCustomContext : PluginBase
+        {
+            public bool UsedCustomContext { get; private set; }
+
+            public TestPluginWithCustomContext() : base(typeof(TestPluginWithCustomContext))
+            {
+            }
+
+            protected override ILocalPluginContext CreateLocalPluginContext(IServiceProvider serviceProvider)
+            {
+                return new CustomLocalPluginContext(serviceProvider, this);
+            }
+
+            protected override void ExecuteDataversePlugin(ILocalPluginContext localPluginContext)
+            {
+                if (localPluginContext is CustomLocalPluginContext)
+                {
+                    UsedCustomContext = true;
+                }
+            }
+
+            private class CustomLocalPluginContext : LocalPluginContext
+            {
+                private readonly TestPluginWithCustomContext _plugin;
+
+                public CustomLocalPluginContext(IServiceProvider serviceProvider, TestPluginWithCustomContext plugin)
+                    : base(serviceProvider)
+                {
+                    _plugin = plugin;
+                }
+            }
         }
     }
 }
