@@ -179,6 +179,11 @@ namespace PipeDream.Plugins.Tests
             {
             }
 
+            protected override void ExecuteDataversePlugin(ILocalPluginContext localPluginContext)
+            {
+                // No-op for config testing
+            }
+
             public string GetUnsecureConfig() => UnsecureConfig;
             public string GetSecureConfig() => SecureConfig;
         }
