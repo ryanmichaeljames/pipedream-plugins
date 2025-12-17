@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Target Framework - Required for Dataverse sandbox -->
+    <TargetFramework>net462</TargetFramework>
+    
+    <!-- Assembly Info -->
+    <AssemblyName>PipeDream.Plugins</AssemblyName>
+    <RootNamespace>PipeDream.Plugins</RootNamespace>
+    
+    <!-- Strong Naming - Required for Dataverse plugin registration -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>PipeDream.Plugins</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Ryan James</Authors>
+    <Description>Custom PluginBase, service extensions, and utilities for building robust Dataverse plugins.</Description>
+    <PackageTags>Dataverse;Plugin;PowerPlatform;Dynamics365;CRM</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ryanmichaeljames/pipedream-plugins</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ryanmichaeljames/pipedream-plugins</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo_nuget.png</PackageIcon>
+    
+    <!-- Enable NuGet packaging -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    
+    <!-- Include symbols for debugging -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Documentation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.PowerApps.MSBuild.Plugin" Version="1.51.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../assets/logo_nuget.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>
