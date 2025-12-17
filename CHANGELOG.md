@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2024-12-18
+
+### Changed
+
+- Made `ExecuteDataversePlugin` abstract instead of virtual to enforce implementation
+
+### Fixed
+
+- Added missing `using Moq;` directive in test files
+- CI/CD pipeline updated to run on Windows for .NET Framework support
+
 ## [1.0.0] - 2024-12-17
 
 ### Added
@@ -23,5 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Application Insights integration via `ILogger`
 - `LocalTracingService` - Tracing with time delta prefixes for performance diagnostics
 
-[Unreleased]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/releases/tag/v1.0.0

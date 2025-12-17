@@ -1,4 +1,4 @@
-![PipeDream Logo Banner](assets/logo_banner.png)
+![PipeDream Logo Banner](https://raw.githubusercontent.com/ryanmichaeljames/pipedream-plugins/main/assets/logo_banner.png)
 
 ![GitHub Release](https://img.shields.io/github/v/release/ryanmichaeljames/pipedream-plugins?style=flat&logo=github&color=33CE57)
 ![NuGet Version](https://img.shields.io/nuget/v/PipeDream.Plugins?logo=nuget&color=33CE57)

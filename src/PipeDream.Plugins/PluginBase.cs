@@ -105,9 +105,6 @@ namespace PipeDream.Plugins
         /// Override this method to implement custom plug-in business logic.
         /// </summary>
         /// <param name="localPluginContext">Context for the current plug-in.</param>
-        protected virtual void ExecuteDataversePlugin(ILocalPluginContext localPluginContext)
-        {
-            // Do nothing - derived classes should override this method.
-        }
+        protected abstract void ExecuteDataversePlugin(ILocalPluginContext localPluginContext);
     }
 }
