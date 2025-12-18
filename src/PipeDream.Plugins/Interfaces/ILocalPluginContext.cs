@@ -16,13 +16,14 @@ namespace PipeDream.Plugins.Interfaces
         /// <summary>
         /// The PowerPlatform Dataverse organization service for the user who triggered the action.
         /// </summary>
-        IOrganizationService InitiatingUserService { get; }
+        IOrganizationService OrganizationService { get; }
 
         /// <summary>
         /// The PowerPlatform Dataverse organization service for the account that was registered 
-        /// to run this plugin. This could be the same user as InitiatingUserService.
+        /// to run this plugin. This could be the same user as OrganizationService.
+        /// Commonly used for elevated privilege operations.
         /// </summary>
-        IOrganizationService PluginUserService { get; }
+        IOrganizationService ElevatedOrganizationService { get; }
 
         /// <summary>
         /// IPluginExecutionContext contains information that describes the run-time environment 
@@ -174,6 +175,14 @@ namespace PipeDream.Plugins.Interfaces
         /// <param name="message">Message to log.</param>
         /// <param name="method">Calling method name (automatically populated).</param>
         void LogError(Exception ex, string message, [CallerMemberName] string method = null);
+
+        /// <summary>
+        /// Creates an organization service for a specific user.
+        /// </summary>
+        /// <param name="userId">The user ID to create the service for.</param>
+        /// <returns>An organization service running as the specified user.</returns>
+        /// <exception cref="InvalidPluginExecutionException">Thrown when userId is empty.</exception>
+        IOrganizationService CreateOrganizationService(Guid userId);
 
         #endregion
     }

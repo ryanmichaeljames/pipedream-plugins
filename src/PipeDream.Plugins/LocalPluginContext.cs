@@ -16,10 +16,10 @@ namespace PipeDream.Plugins
         #region Services
 
         /// <inheritdoc/>
-        public IOrganizationService InitiatingUserService { get; }
+        public IOrganizationService OrganizationService { get; }
 
         /// <inheritdoc/>
-        public IOrganizationService PluginUserService { get; }
+        public IOrganizationService ElevatedOrganizationService { get; }
 
         /// <inheritdoc/>
         public IPluginExecutionContext PluginExecutionContext { get; }
@@ -174,11 +174,11 @@ namespace PipeDream.Plugins
 
             OrgSvcFactory = serviceProvider.Get<IOrganizationServiceFactory>();
 
-            // User that the plugin is registered to run as (could be same as initiating user)
-            PluginUserService = serviceProvider.GetOrganizationService(PluginExecutionContext.UserId);
-
             // User whose action triggered the plugin
-            InitiatingUserService = serviceProvider.GetOrganizationService(PluginExecutionContext.InitiatingUserId);
+            OrganizationService = serviceProvider.GetOrganizationService(PluginExecutionContext.InitiatingUserId);
+
+            // User that the plugin is registered to run as (could be same as initiating user)
+            ElevatedOrganizationService = serviceProvider.GetOrganizationService(PluginExecutionContext.UserId);
         }
 
         #endregion
@@ -269,6 +269,17 @@ namespace PipeDream.Plugins
 
             // Application Insights - structured exception logging
             Logger?.LogError(ex, formattedMessage);
+        }
+
+        /// <inheritdoc/>
+        public IOrganizationService CreateOrganizationService(Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                throw new InvalidPluginExecutionException("User ID cannot be empty");
+            }
+
+            return OrgSvcFactory.CreateOrganizationService(userId);
         }
 
         #endregion

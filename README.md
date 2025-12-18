@@ -21,6 +21,8 @@ dotnet add package PipeDream.Plugins
 - Type-safe constants for messages, stages, modes, and image names
 - Access to all IPluginExecutionContext interfaces (1-7)
 - Helper properties for Target, PreImage, PostImage
+- Organization services for initiating user and elevated privileges
+- Create organization services for specific users on-demand
 
 ## Usage
 
@@ -38,6 +40,7 @@ public class MyPlugin : PluginBase
     {
         var context = localPluginContext.PluginExecutionContext;
         var service = localPluginContext.OrganizationService;
+        var elevatedService = localPluginContext.ElevatedOrganizationService;
         
         // Your plugin logic here
     }
@@ -138,6 +141,38 @@ if (localPluginContext.PluginExecutionContext7.IsApplicationUser)
     // Handle automation differently
 }
 ```
+
+### Organization Services
+
+The context provides convenient access to organization services:
+
+**OrganizationService** - Service running as the user who triggered the action:
+```csharp
+var service = localPluginContext.OrganizationService;
+var account = service.Retrieve("account", accountId, new ColumnSet("name"));
+```
+
+**ElevatedOrganizationService** - Service running as the plugin registration user:
+```csharp
+var elevatedService = localPluginContext.ElevatedOrganizationService;
+// Use for operations requiring elevated privileges
+elevatedService.Update(restrictedEntity);
+```
+
+**CreateOrganizationService(userId)** - Create a service for a specific user:
+```csharp
+// Get service for a specific user (e.g., from a lookup field)
+var targetUserId = account.GetAttributeValue<EntityReference>("ownerid").Id;
+var targetUserService = localPluginContext.CreateOrganizationService(targetUserId);
+
+// Perform operations as that specific user
+targetUserService.Create(entityAsTargetUser);
+```
+
+This is useful for:
+- Impersonation scenarios
+- Operations that need to run as a specific user
+- Creating services for system administrators dynamically
 
 ### Logging
 

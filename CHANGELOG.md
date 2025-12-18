@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `CreateOrganizationService(Guid userId)` method to `ILocalPluginContext` for creating organization services for specific users
+
+## [1.1.0] - 2024-12-18
+
+### Changed
+
+- Renamed `InitiatingUserService` to `OrganizationService` for better naming consistency
+- Renamed `PluginUserService` to `ElevatedOrganizationService` for clarity on elevated privileges
+
 ## [1.0.1] - 2024-12-18
 
 ### Changed
@@ -34,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Application Insights integration via `ILogger`
 - `LocalTracingService` - Tracing with time delta prefixes for performance diagnostics
 
-[Unreleased]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ryanmichaeljames/pipe-dream-dataverse-plugins/releases/tag/v1.0.0
