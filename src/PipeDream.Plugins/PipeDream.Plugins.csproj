@@ -15,7 +15,7 @@
     
     <!-- NuGet Package Metadata -->
     <PackageId>PipeDream.Plugins</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Ryan James</Authors>
     <Description>Custom PluginBase, service extensions, and utilities for building robust Dataverse plugins.</Description>
     <PackageTags>Dataverse;Plugin;PowerPlatform;Dynamics365;CRM</PackageTags>

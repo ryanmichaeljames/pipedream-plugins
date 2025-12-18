@@ -29,8 +29,8 @@ namespace PipeDream.Plugins.Tests
             Assert.NotNull(context.PluginExecutionContext);
             Assert.NotNull(context.TracingService);
             Assert.NotNull(context.OrgSvcFactory);
-            Assert.NotNull(context.InitiatingUserService);
-            Assert.NotNull(context.PluginUserService);
+            Assert.NotNull(context.OrganizationService);
+            Assert.NotNull(context.ElevatedOrganizationService);
             Assert.NotNull(context.ServiceProvider);
         }
 
@@ -90,6 +90,33 @@ namespace PipeDream.Plugins.Tests
             Assert.NotNull(context.PluginExecutionContext5);
             Assert.NotNull(context.PluginExecutionContext6);
             Assert.NotNull(context.PluginExecutionContext7);
+        }
+
+        [Fact]
+        public void CreateOrganizationService_WithValidUserId_ReturnsService()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+            var userId = Guid.NewGuid();
+
+            // Act
+            var service = context.CreateOrganizationService(userId);
+
+            // Assert
+            Assert.NotNull(service);
+        }
+
+        [Fact]
+        public void CreateOrganizationService_WithEmptyGuid_ThrowsInvalidPluginExecutionException()
+        {
+            // Arrange
+            var serviceProvider = new FakeServiceProvider();
+            var context = new LocalPluginContext(serviceProvider);
+
+            // Act & Assert
+            var ex = Assert.Throws<InvalidPluginExecutionException>(() => context.CreateOrganizationService(Guid.Empty));
+            Assert.Equal("User ID cannot be empty", ex.Message);
         }
 
         [Fact]
